@@ -1,131 +1,131 @@
-import { Cloud } from '@react-three/drei';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Bloom, EffectComposer } from '@react-three/postprocessing';
-import { AnimatePresence, motion } from 'framer-motion';
-import { CloudRain, List, Maximize2, Minimize2, Shuffle } from 'lucide-react';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import * as THREE from 'three';
+import { Cloud } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
+import { AnimatePresence, motion } from "framer-motion";
+import { CloudRain, List, Maximize2, Minimize2, Shuffle } from "lucide-react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+import * as THREE from "three";
 
-const dreamWords = ['Relax', 'Breathe', 'Peace', 'Unwind', 'Stillness', 'Drift'];
+const dreamWords = ["Relax", "Breathe", "Peace", "Unwind", "Stillness", "Drift"];
 
 const THEME_CATEGORIES = [
   {
-    name: 'Sunset/Twilight',
+    name: "Sunset/Twilight",
     themes: [
       {
-        name: 'Peach Dust',
-        colors: ['#fdf2f8', '#fed7aa', '#fdf2f8'],
-        cloudTint: '#fecaca',
+        name: "Peach Dust",
+        colors: ["#fdf2f8", "#fed7aa", "#fdf2f8"],
+        cloudTint: "#fecaca",
       },
       {
-        name: 'Lilac Blush',
-        colors: ['#e0f2fe', '#fbcfe8', '#fff7ed'],
-        cloudTint: '#f5d0fe',
+        name: "Lilac Blush",
+        colors: ["#e0f2fe", "#fbcfe8", "#fff7ed"],
+        cloudTint: "#f5d0fe",
       },
       {
-        name: 'Mint Apricot',
-        colors: ['#fafaf9', '#ffedd5', '#ecfdf5'],
-        cloudTint: '#dbeafe',
+        name: "Mint Apricot",
+        colors: ["#fafaf9", "#ffedd5", "#ecfdf5"],
+        cloudTint: "#dbeafe",
       },
     ],
   },
   {
-    name: 'Dreamy Pastels',
+    name: "Dreamy Pastels",
     themes: [
       {
-        name: 'Cotton Candy',
-        colors: ['#dbeafe', '#fce7f3', '#fef9c3'],
-        cloudTint: '#e0f2fe',
+        name: "Cotton Candy",
+        colors: ["#dbeafe", "#fce7f3", "#fef9c3"],
+        cloudTint: "#e0f2fe",
       },
       {
-        name: 'Seafoam Aqua',
-        colors: ['#f0fdf4', '#fce7f3', '#ecfeff'],
-        cloudTint: '#ccfbf1',
+        name: "Seafoam Aqua",
+        colors: ["#f0fdf4", "#fce7f3", "#ecfeff"],
+        cloudTint: "#ccfbf1",
       },
       {
-        name: 'Rose Butter',
-        colors: ['#f5f3ff', '#fef3c7', '#fdf2f8'],
-        cloudTint: '#fafaf9',
+        name: "Rose Butter",
+        colors: ["#f5f3ff", "#fef3c7", "#fdf2f8"],
+        cloudTint: "#fafaf9",
       },
     ],
   },
   {
-    name: 'Cool & Calming',
+    name: "Cool & Calming",
     themes: [
       {
-        name: 'Silver Sage',
-        colors: ['#f0f9ff', '#f1f5f9', '#fdf2f8'],
-        cloudTint: '#cbd5e1',
+        name: "Silver Sage",
+        colors: ["#f0f9ff", "#f1f5f9", "#fdf2f8"],
+        cloudTint: "#cbd5e1",
       },
       {
-        name: 'Turquoise Coral',
-        colors: ['#f0fdff', '#f5f3ff', '#fff1f2'],
-        cloudTint: '#ccfbf1',
+        name: "Turquoise Coral",
+        colors: ["#f0fdff", "#f5f3ff", "#fff1f2"],
+        cloudTint: "#ccfbf1",
       },
       {
-        name: 'Soft Taupe',
-        colors: ['#eff6ff', '#f5f5f4', '#fff1f2'],
-        cloudTint: '#f1f5f9',
+        name: "Soft Taupe",
+        colors: ["#eff6ff", "#f5f5f4", "#fff1f2"],
+        cloudTint: "#f1f5f9",
       },
     ],
   },
   {
-    name: 'Warm & Gentle',
+    name: "Warm & Gentle",
     themes: [
       {
-        name: 'Gold Peachy',
-        colors: ['#fff7ed', '#fafaf9', '#fdf2f8'],
-        cloudTint: '#fef3c7',
+        name: "Gold Peachy",
+        colors: ["#fff7ed", "#fafaf9", "#fdf2f8"],
+        cloudTint: "#fef3c7",
       },
       {
-        name: 'Terra Coral',
-        colors: ['#fff1f2', '#fef2f2', '#fff7ed'],
-        cloudTint: '#ffedd5',
+        name: "Terra Coral",
+        colors: ["#fff1f2", "#fef2f2", "#fff7ed"],
+        cloudTint: "#ffedd5",
       },
       {
-        name: 'Champagne Nude',
-        colors: ['#fff7ed', '#f5f5f4', '#fdf2f8'],
-        cloudTint: '#fafaf9',
+        name: "Champagne Nude",
+        colors: ["#fff7ed", "#f5f5f4", "#fdf2f8"],
+        cloudTint: "#fafaf9",
       },
     ],
   },
   {
-    name: 'Nature-Inspired',
+    name: "Nature-Inspired",
     themes: [
       {
-        name: 'Sage White',
-        colors: ['#f0fdf4', '#fdf2f8', '#f5f5f4'],
-        cloudTint: '#dcfce7',
+        name: "Sage White",
+        colors: ["#f0fdf4", "#fdf2f8", "#f5f5f4"],
+        cloudTint: "#dcfce7",
       },
       {
-        name: 'Eucalyptus',
-        colors: ['#effdf5', '#fdf2f8', '#f8fafc'],
-        cloudTint: '#ecfdf5',
+        name: "Eucalyptus",
+        colors: ["#effdf5", "#fdf2f8", "#f8fafc"],
+        cloudTint: "#ecfdf5",
       },
       {
-        name: 'Teal Moss',
-        colors: ['#f0fdfa', '#fdf2f8', '#fefce8'],
-        cloudTint: '#f1f5f9',
+        name: "Teal Moss",
+        colors: ["#f0fdfa", "#fdf2f8", "#fefce8"],
+        cloudTint: "#f1f5f9",
       },
     ],
   },
   {
-    name: 'Ethereal/Cloudy',
+    name: "Ethereal/Cloudy",
     themes: [
       {
-        name: 'Pearl Fog',
-        colors: ['#fafafa', '#fdf2f8', '#f0f9ff'],
-        cloudTint: '#ffffff',
+        name: "Pearl Fog",
+        colors: ["#fafafa", "#fdf2f8", "#f0f9ff"],
+        cloudTint: "#ffffff",
       },
       {
-        name: 'Quartz Fog',
-        colors: ['#f8fafc', '#fdf2f8', '#f5f3ff'],
-        cloudTint: '#f5f3ff',
+        name: "Quartz Fog",
+        colors: ["#f8fafc", "#fdf2f8", "#f5f3ff"],
+        cloudTint: "#f5f3ff",
       },
       {
-        name: 'Milky Lilac',
-        colors: ['#ffffff', '#f5f3ff', '#fff7ed'],
-        cloudTint: '#ffffff',
+        name: "Milky Lilac",
+        colors: ["#ffffff", "#f5f3ff", "#fff7ed"],
+        cloudTint: "#ffffff",
       },
     ],
   },
@@ -220,9 +220,9 @@ function TwinklingStars() {
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute attach='attributes-position' args={[positions, 3]} />
-        <bufferAttribute attach='attributes-size' args={[sizes, 1]} />
-        <bufferAttribute attach='attributes-twinkleSeed' args={[twinkleSeeds, 1]} />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-size" args={[sizes, 1]} />
+        <bufferAttribute attach="attributes-twinkleSeed" args={[twinkleSeeds, 1]} />
       </bufferGeometry>
       <shaderMaterial
         ref={materialRef}
@@ -478,7 +478,7 @@ const DriftingClouds = memo(function DriftingClouds({ cloudTint }: { cloudTint: 
         phase: 13.5,
       },
     ],
-    [cloudTint]
+    [cloudTint],
   );
 
   return (
@@ -494,7 +494,7 @@ const SceneCanvas = memo(function SceneCanvas({ cloudTint }: { cloudTint: string
   return (
     <Canvas camera={{ position: [0, 0, 10], fov: 75 }} gl={{ antialias: true }}>
       <ambientLight intensity={0.6} />
-      <pointLight position={[10, 10, 10]} intensity={0.8} color='#fff' />
+      <pointLight position={[10, 10, 10]} intensity={0.8} color="#fff" />
       <TwinklingStars />
       <DriftingClouds cloudTint={cloudTint} />
       <EffectComposer>
@@ -506,22 +506,22 @@ const SceneCanvas = memo(function SceneCanvas({ cloudTint }: { cloudTint: string
 
 const DreamTitle = memo(function DreamTitle({ wordIndex }: { wordIndex: number }) {
   return (
-    <div className='absolute z-10 text-center -translate-x-1/2 -translate-y-1/2 pointer-events-none top-1/2 left-1/2'>
-      <h1 className='sr-only'>Dream Transmission - Meditative Ambient Music Experience</h1>
+    <div className="absolute z-10 text-center -translate-x-1/2 -translate-y-1/2 pointer-events-none top-1/2 left-1/2">
+      <h1 className="sr-only">Dream Transmission - Meditative Ambient Music Experience</h1>
       <motion.h2
-        initial={{ opacity: 0, scale: 0.8, filter: 'blur(10px)' }}
-        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+        initial={{ opacity: 0, scale: 0.8, filter: "blur(10px)" }}
+        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
         transition={{ duration: 4 }}
-        className='font-serif text-6xl italic text-white md:text-8xl mix-blend-overlay drop-shadow-lg'
+        className="font-serif text-6xl italic text-white md:text-8xl mix-blend-overlay drop-shadow-lg"
       >
-        <AnimatePresence mode='wait'>
+        <AnimatePresence mode="wait">
           <motion.span
             key={dreamWords[wordIndex]}
-            initial={{ opacity: 0, y: 10, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -10, filter: 'blur(8px)' }}
-            transition={{ duration: 2.2, ease: 'easeInOut' }}
-            className='inline-block'
+            initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
+            transition={{ duration: 2.2, ease: "easeInOut" }}
+            className="inline-block"
           >
             {dreamWords[wordIndex]}
           </motion.span>
@@ -531,17 +531,17 @@ const DreamTitle = memo(function DreamTitle({ wordIndex }: { wordIndex: number }
   );
 });
 
-import ambientRainStorm from './assets/ambient/rain-storm.mp3';
-import ambientRainThunder from './assets/ambient/rain-storm2.mp3';
-import ambientRainLittleStorm from './assets/ambient/rain-storm3.mp3';
+import ambientRainStorm from "./assets/ambient/rain-storm.mp3";
+import ambientRainThunder from "./assets/ambient/rain-storm2.mp3";
+import ambientRainLittleStorm from "./assets/ambient/rain-storm3.mp3";
 
 const AMBIENT_SOUNDS = [
-  { label: 'Rain Storm', src: ambientRainStorm, icon: CloudRain },
-  { label: 'Rain & Thunder', src: ambientRainThunder, icon: CloudRain },
-  { label: 'Light Rain', src: ambientRainLittleStorm, icon: CloudRain },
+  { label: "Rain Storm", src: ambientRainStorm, icon: CloudRain },
+  { label: "Rain & Thunder", src: ambientRainThunder, icon: CloudRain },
+  { label: "Light Rain", src: ambientRainLittleStorm, icon: CloudRain },
 ];
 
-type PlayerMode = 'minimized' | 'normal' | 'maximized';
+type PlayerMode = "minimized" | "normal" | "maximized";
 
 type DreamTrack = { label: string; artist: string; src: string };
 
@@ -558,30 +558,30 @@ export default function DreamTransmission() {
   const [dreamTracks, setDreamTracks] = useState<DreamTrack[]>([]);
 
   useEffect(() => {
-    const baseUrl = import.meta.env.VITE_MUSIC_BASE_URL || '/music';
-    fetch('/music-manifest.json')
+    const baseUrl = import.meta.env.VITE_MUSIC_BASE_URL || "/music";
+    fetch("/music-manifest.json")
       .then((res) => res.json())
       .then((manifest: Record<string, string>) => {
         const tracks = Object.entries(manifest)
           .map(([filename, _]) => {
-            const baseName = filename.replace(/\.[^/.]+$/, '');
-            const [artistPart, ...titleParts] = baseName.split(' - ');
+            const baseName = filename.replace(/\.[^/.]+$/, "");
+            const [artistPart, ...titleParts] = baseName.split(" - ");
             const hasArtist = titleParts.length > 0;
             return {
-              label: hasArtist ? titleParts.join(' - ') : baseName,
-              artist: hasArtist ? artistPart : 'Ambient',
+              label: hasArtist ? titleParts.join(" - ") : baseName,
+              artist: hasArtist ? artistPart : "Ambient",
               src: `${baseUrl}/${filename}`,
             };
           })
-          .sort((a, b) => `${a.artist} ${a.label}`.localeCompare(`${b.artist} ${b.label}`));
+          .toSorted((a, b) => `${a.artist} ${a.label}`.localeCompare(`${b.artist} ${b.label}`));
         setDreamTracks(tracks);
       })
-      .catch((err) => console.error('Failed to load music manifest:', err));
+      .catch((err) => console.error("Failed to load music manifest:", err));
   }, []);
   const [wordIndex, setWordIndex] = useState(0);
   const [trackIndex, setTrackIndex] = useState(0);
   const [themeIndex, setThemeIndex] = useState(1); // Default to Lilac Blush
-  const [playerMode, setPlayerMode] = useState<PlayerMode>('normal');
+  const [playerMode, setPlayerMode] = useState<PlayerMode>("normal");
   const [showThemePicker, setShowThemePicker] = useState(false);
   const [comets, setComets] = useState<
     Array<{
@@ -599,7 +599,7 @@ export default function DreamTransmission() {
 
   const ensureAudioBoost = useMemo(() => {
     return () => {
-      if (audioBoostReadyRef.current || typeof window === 'undefined') return;
+      if (audioBoostReadyRef.current || typeof window === "undefined") return;
       const audio = audioRef.current;
       if (!audio || !window.AudioContext) return;
 
@@ -620,7 +620,7 @@ export default function DreamTransmission() {
     ensureAudioBoost();
     setBoostActive(true);
     const context = audioContextRef.current;
-    if (context && context.state === 'suspended') {
+    if (context && context.state === "suspended") {
       await context.resume();
     }
   }
@@ -661,7 +661,7 @@ export default function DreamTransmission() {
       void audio.play().catch(() => {});
     } else {
       audio.pause();
-      audio.src = '';
+      audio.src = "";
     }
   }, [ambientIndex]);
 
@@ -698,7 +698,7 @@ export default function DreamTransmission() {
           window.setTimeout(spawnComet, 300 + Math.random() * 700);
         }
       },
-      12000 + Math.random() * 10000
+      12000 + Math.random() * 10000,
     );
 
     return () => {
@@ -757,7 +757,7 @@ export default function DreamTransmission() {
       ensureAudioBoost();
       const context = audioContextRef.current;
       const resumePromise =
-        context && context.state === 'suspended' ? context.resume() : Promise.resolve();
+        context && context.state === "suspended" ? context.resume() : Promise.resolve();
 
       void resumePromise.then(() => {
         void audio.play().catch(() => {
@@ -787,32 +787,32 @@ export default function DreamTransmission() {
 
   const currentTheme = ALL_THEMES[themeIndex];
   const playerWidth =
-    playerMode === 'minimized'
-      ? 'min(16rem, calc(100vw - 2rem))'
-      : playerMode === 'maximized'
-        ? 'min(28rem, calc(100vw - 2rem))'
-        : 'min(24rem, calc(100vw - 2rem))';
+    playerMode === "minimized"
+      ? "min(16rem, calc(100vw - 2rem))"
+      : playerMode === "maximized"
+        ? "min(28rem, calc(100vw - 2rem))"
+        : "min(24rem, calc(100vw - 2rem))";
 
   return (
     <div
       ref={bgRef}
-      className='relative w-full h-screen overflow-hidden transition-all duration-1000'
+      className="relative w-full h-screen overflow-hidden transition-all duration-1000"
       style={{
         background: `linear-gradient(to bottom, ${currentTheme.colors[0]}, ${currentTheme.colors[1]}, ${currentTheme.colors[2]})`,
       }}
     >
       {/* Top-Left Wake Up Button */}
-      <div className='absolute z-30 top-6 left-6'>
+      <div className="absolute z-30 top-6 left-6">
         <a
-          href='https://waking.coreyburns.ca'
-          className='bg-white/25 backdrop-blur-xl border border-white/20 px-5 py-2.5 rounded-full text-slate-700/80 uppercase tracking-widest text-[10px] hover:bg-white/45 transition-all shadow-lg hover:scale-105 duration-300'
+          href="https://waking.coreyburns.ca"
+          className="bg-white/25 backdrop-blur-xl border border-white/20 px-5 py-2.5 rounded-full text-slate-700/80 uppercase tracking-widest text-[10px] hover:bg-white/45 transition-all shadow-lg hover:scale-105 duration-300"
         >
           Wake Up
         </a>
       </div>
 
       {/* Theme Picker Widget (Bottom-Left) */}
-      <div className='absolute z-30 left-4 bottom-4 sm:left-6 sm:bottom-6 max-[380px]:left-auto max-[380px]:right-4 max-[380px]:bottom-auto max-[380px]:top-20'>
+      <div className="absolute z-30 left-4 bottom-4 sm:left-6 sm:bottom-6 max-[380px]:left-auto max-[380px]:right-4 max-[380px]:bottom-auto max-[380px]:top-20">
         <AnimatePresence>
           {showThemePicker && (
             <>
@@ -822,69 +822,69 @@ export default function DreamTransmission() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setShowThemePicker(false)}
-                className='fixed inset-0 z-10'
+                className="fixed inset-0 z-10"
               />
               <motion.div
                 initial={{ opacity: 0, y: 20, scale: 0.9 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                className='relative z-20 mb-4 w-[min(92vw,40rem)] max-h-[70vh] overflow-y-auto rounded-3xl border border-white/45 bg-white/35 p-5 shadow-2xl backdrop-blur-2xl custom-scrollbar'
+                className="relative z-20 mb-4 w-[min(92vw,40rem)] max-h-[70vh] overflow-y-auto rounded-3xl border border-white/45 bg-white/35 p-5 shadow-2xl backdrop-blur-2xl custom-scrollbar"
               >
-                <div className='flex items-center justify-between mb-4'>
-                  <h3 className='text-xs font-bold tracking-widest uppercase text-slate-700/60'>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xs font-bold tracking-widest uppercase text-slate-700/60">
                     Atmosphere
                   </h3>
                   <button
-                    type='button'
+                    type="button"
                     onClick={() => setShowThemePicker(false)}
-                    className='text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-800'
+                    className="text-[10px] uppercase tracking-widest text-slate-500 hover:text-slate-800"
                   >
                     Close
                   </button>
                 </div>
 
-                <div className='space-y-6'>
+                <div className="space-y-6">
                   {THEME_CATEGORIES.map((cat) => (
                     <div key={cat.name}>
-                      <h4 className='text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-3 ml-1'>
+                      <h4 className="text-[10px] uppercase tracking-[0.2em] text-slate-500 mb-3 ml-1">
                         {cat.name}
                       </h4>
-                      <div className='grid grid-cols-3 gap-2'>
+                      <div className="grid grid-cols-3 gap-2">
                         {cat.themes.map((theme) => {
                           const globalIndex = ALL_THEMES.findIndex((t) => t.name === theme.name);
                           const isSelected = themeIndex === globalIndex;
                           return (
                             <button
                               key={theme.name}
-                              type='button'
+                              type="button"
                               onClick={() => {
                                 setThemeIndex(globalIndex);
                                 setShowThemePicker(false); // Auto-close on selection
                               }}
                               className={`group relative p-3 rounded-2xl transition-all border ${
                                 isSelected
-                                  ? 'bg-white/60 border-white/60 shadow-md scale-105'
-                                  : 'bg-white/5 border-transparent hover:bg-white/20'
+                                  ? "bg-white/60 border-white/60 shadow-md scale-105"
+                                  : "bg-white/5 border-transparent hover:bg-white/20"
                               }`}
                             >
-                              <div className='flex gap-1 mb-2'>
+                              <div className="flex gap-1 mb-2">
                                 {theme.colors.map((c, i) => (
                                   <div
                                     key={`${theme.name}-${c}-${i}`}
-                                    className='w-3 h-3 rounded-full shadow-sm'
+                                    className="w-3 h-3 rounded-full shadow-sm"
                                     style={{ backgroundColor: c }}
                                   />
                                 ))}
                               </div>
                               <p
                                 className={`text-[10px] font-medium truncate ${
-                                  isSelected ? 'text-slate-900' : 'text-slate-600'
+                                  isSelected ? "text-slate-900" : "text-slate-600"
                                 }`}
                               >
                                 {theme.name}
                               </p>
                               {isSelected && (
-                                <div className='absolute top-2 right-2 w-1.5 h-1.5 bg-slate-400 rounded-full' />
+                                <div className="absolute top-2 right-2 w-1.5 h-1.5 bg-slate-400 rounded-full" />
                               )}
                             </button>
                           );
@@ -899,106 +899,106 @@ export default function DreamTransmission() {
         </AnimatePresence>
 
         <button
-          type='button'
+          type="button"
           onClick={() => setShowThemePicker(!showThemePicker)}
-          className='flex items-center gap-2 p-3 transition-all border shadow-xl bg-white/30 backdrop-blur-xl border-white/20 rounded-2xl hover:bg-white/50 hover:scale-105 group'
-          title='Change Atmosphere'
+          className="flex items-center gap-2 p-3 transition-all border shadow-xl bg-white/30 backdrop-blur-xl border-white/20 rounded-2xl hover:bg-white/50 hover:scale-105 group"
+          title="Change Atmosphere"
         >
-          <div className='flex -space-x-1.5'>
+          <div className="flex -space-x-1.5">
             {currentTheme.colors.map((c, i) => (
               <div
                 key={`trigger-${currentTheme.name}-${c}-${i}`}
-                className='w-4 h-4 border rounded-full shadow-sm border-white/40'
+                className="w-4 h-4 border rounded-full shadow-sm border-white/40"
                 style={{ backgroundColor: c }}
               />
             ))}
           </div>
-          <span className='text-[10px] font-bold uppercase tracking-widest text-slate-700/60 ml-1 group-hover:text-slate-800 transition-colors'>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-700/60 ml-1 group-hover:text-slate-800 transition-colors">
             {currentTheme.name}
           </span>
         </button>
       </div>
       <motion.div
-        drag={playerMode === 'normal'}
+        drag={playerMode === "normal"}
         dragMomentum={false}
         animate={{
           width: playerWidth,
           height:
-            playerMode === 'minimized' ? 'auto' : playerMode === 'maximized' ? '30rem' : 'auto',
+            playerMode === "minimized" ? "auto" : playerMode === "maximized" ? "30rem" : "auto",
         }}
-        className='absolute z-30 p-3 overflow-hidden border shadow-2xl right-4 bottom-4 rounded-2xl border-white/45 bg-white/35 text-slate-700 backdrop-blur-xl sm:right-6 sm:bottom-6'
+        className="absolute z-30 p-3 overflow-hidden border shadow-2xl right-4 bottom-4 rounded-2xl border-white/45 bg-white/35 text-slate-700 backdrop-blur-xl sm:right-6 sm:bottom-6"
         style={{
-          resize: playerMode === 'normal' ? 'both' : 'none',
-          minWidth: 'min(16rem, calc(100vw - 2rem))',
-          maxWidth: 'calc(100vw - 1rem)',
-          minHeight: playerMode === 'minimized' ? 'auto' : '8rem',
+          resize: playerMode === "normal" ? "both" : "none",
+          minWidth: "min(16rem, calc(100vw - 2rem))",
+          maxWidth: "calc(100vw - 1rem)",
+          minHeight: playerMode === "minimized" ? "auto" : "8rem",
         }}
       >
-        <div className='flex items-center justify-between mb-2'>
-          <div className='flex items-center gap-2'>
-            <p className='text-[10px] uppercase tracking-[0.25em] text-slate-600/80'>
-              {playerMode === 'minimized' ? 'Dream' : 'Ambient Audio'}
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-slate-600/80">
+              {playerMode === "minimized" ? "Dream" : "Ambient Audio"}
             </p>
           </div>
-          <div className='flex items-center gap-1.5'>
+          <div className="flex items-center gap-1.5">
             <button
-              type='button'
-              onClick={() => setPlayerMode(playerMode === 'minimized' ? 'normal' : 'minimized')}
-              className='p-1 transition-colors rounded-full hover:bg-white/20'
-              title={playerMode === 'minimized' ? 'Restore' : 'Minimize'}
+              type="button"
+              onClick={() => setPlayerMode(playerMode === "minimized" ? "normal" : "minimized")}
+              className="p-1 transition-colors rounded-full hover:bg-white/20"
+              title={playerMode === "minimized" ? "Restore" : "Minimize"}
             >
-              {playerMode === 'minimized' ? <Maximize2 size={12} /> : <Minimize2 size={12} />}
+              {playerMode === "minimized" ? <Maximize2 size={12} /> : <Minimize2 size={12} />}
             </button>
             <button
-              type='button'
-              onClick={() => setPlayerMode(playerMode === 'maximized' ? 'normal' : 'maximized')}
-              className='p-1 transition-colors rounded-full hover:bg-white/20'
-              title={playerMode === 'maximized' ? 'Standard View' : 'Playlist'}
+              type="button"
+              onClick={() => setPlayerMode(playerMode === "maximized" ? "normal" : "maximized")}
+              className="p-1 transition-colors rounded-full hover:bg-white/20"
+              title={playerMode === "maximized" ? "Standard View" : "Playlist"}
             >
               <List size={12} />
             </button>
-            {playerMode !== 'minimized' && (
-              <span className='text-[10px] uppercase tracking-[0.16em] text-slate-700/80 ml-1'>
-                {dreamTracks.length > 0 ? `${trackIndex + 1}/${dreamTracks.length}` : '0/0'}
+            {playerMode !== "minimized" && (
+              <span className="text-[10px] uppercase tracking-[0.16em] text-slate-700/80 ml-1">
+                {dreamTracks.length > 0 ? `${trackIndex + 1}/${dreamTracks.length}` : "0/0"}
               </span>
             )}
           </div>
         </div>
 
-        {playerMode === 'minimized' ? (
+        {playerMode === "minimized" ? (
           <div>
-            <div className='flex items-center justify-between gap-2 mb-1.5'>
-              <p className='text-[11px] font-medium truncate flex-1'>
-                {dreamTracks[trackIndex]?.label || 'Nothing playing'}
+            <div className="flex items-center justify-between gap-2 mb-1.5">
+              <p className="text-[11px] font-medium truncate flex-1">
+                {dreamTracks[trackIndex]?.label || "Nothing playing"}
               </p>
-              <div className='flex gap-1'>
+              <div className="flex gap-1">
                 <button
-                  type='button'
+                  type="button"
                   onClick={goToPreviousTrack}
-                  className='text-slate-600 hover:text-slate-900'
-                  title='Prev'
+                  className="text-slate-600 hover:text-slate-900"
+                  title="Prev"
                 >
-                  <span className='text-[10px]'>◀</span>
+                  <span className="text-[10px]">◀</span>
                 </button>
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => setIsShuffle(!isShuffle)}
                   className={`transition-all duration-300 ${
                     isShuffle
-                      ? 'text-slate-900 scale-110 drop-shadow-sm'
-                      : 'text-slate-600/60 hover:text-slate-900'
+                      ? "text-slate-900 scale-110 drop-shadow-sm"
+                      : "text-slate-600/60 hover:text-slate-900"
                   }`}
-                  title={isShuffle ? 'Shuffle On' : 'Shuffle Off'}
+                  title={isShuffle ? "Shuffle On" : "Shuffle Off"}
                 >
                   <Shuffle size={10} strokeWidth={isShuffle ? 3 : 2} />
                 </button>
                 <button
-                  type='button'
+                  type="button"
                   onClick={goToNextTrack}
-                  className='text-slate-600 hover:text-slate-900'
-                  title='Next'
+                  className="text-slate-600 hover:text-slate-900"
+                  title="Next"
                 >
-                  <span className='text-[10px]'>▶</span>
+                  <span className="text-[10px]">▶</span>
                 </button>
               </div>
             </div>
@@ -1006,107 +1006,107 @@ export default function DreamTransmission() {
         ) : (
           <>
             {dreamTracks.length > 0 ? (
-              <div className='mb-3'>
-                <p className='text-sm font-semibold leading-tight truncate'>
+              <div className="mb-3">
+                <p className="text-sm font-semibold leading-tight truncate">
                   {dreamTracks[trackIndex].label}
                 </p>
-                <p className='text-[11px] text-slate-700/75 truncate leading-tight'>
+                <p className="text-[11px] text-slate-700/75 truncate leading-tight">
                   {dreamTracks[trackIndex].artist}
                 </p>
               </div>
             ) : (
-              <p className='mb-3 text-xs text-slate-700/80'>No songs found</p>
+              <p className="mb-3 text-xs text-slate-700/80">No songs found</p>
             )}
 
-            {playerMode === 'maximized' && (
-              <div className='flex-1 pr-1 mb-4 overflow-y-auto max-h-64 custom-scrollbar'>
-                <div className='space-y-1'>
+            {playerMode === "maximized" && (
+              <div className="flex-1 pr-1 mb-4 overflow-y-auto max-h-64 custom-scrollbar">
+                <div className="space-y-1">
                   {dreamTracks.map((track, i) => (
                     <button
-                      type='button'
+                      type="button"
                       key={track.src}
                       onClick={() => selectTrack(i)}
                       className={`w-full text-left p-2 rounded-lg text-[11px] transition-all ${
                         trackIndex === i
-                          ? 'bg-white/50 shadow-sm border border-white/40'
-                          : 'hover:bg-white/20'
+                          ? "bg-white/50 shadow-sm border border-white/40"
+                          : "hover:bg-white/20"
                       }`}
                     >
-                      <p className='font-medium truncate'>{track.label}</p>
-                      <p className='truncate opacity-60'>{track.artist}</p>
+                      <p className="font-medium truncate">{track.label}</p>
+                      <p className="truncate opacity-60">{track.artist}</p>
                     </button>
                   ))}
                 </div>
               </div>
             )}
 
-            <div className='flex flex-wrap items-center gap-2'>
+            <div className="flex flex-wrap items-center gap-2">
               <button
-                type='button'
+                type="button"
                 onClick={goToPreviousTrack}
                 disabled={dreamTracks.length === 0}
-                className='rounded-full border border-slate-700/35 bg-white/40 px-3 py-1.5 text-[9px] uppercase tracking-[0.16em] text-slate-800 transition hover:bg-white/65 disabled:opacity-50'
-                title='Previous Track'
+                className="rounded-full border border-slate-700/35 bg-white/40 px-3 py-1.5 text-[9px] uppercase tracking-[0.16em] text-slate-800 transition hover:bg-white/65 disabled:opacity-50"
+                title="Previous Track"
               >
                 Prev
               </button>
               <button
-                type='button'
+                type="button"
                 onClick={() => setIsShuffle(!isShuffle)}
                 disabled={dreamTracks.length === 0}
                 className={`rounded-full border px-3 py-1.5 transition-all duration-300 disabled:opacity-50 ${
                   isShuffle
-                    ? 'bg-white/60 border-white/80 text-slate-900 shadow-md scale-105'
-                    : 'border-slate-700/25 bg-white/20 text-slate-600 hover:bg-white/40'
+                    ? "bg-white/60 border-white/80 text-slate-900 shadow-md scale-105"
+                    : "border-slate-700/25 bg-white/20 text-slate-600 hover:bg-white/40"
                 }`}
-                title={isShuffle ? 'Shuffle: Playing at Random' : 'Shuffle: Off'}
+                title={isShuffle ? "Shuffle: Playing at Random" : "Shuffle: Off"}
               >
                 <Shuffle size={12} strokeWidth={isShuffle ? 3 : 2} />
               </button>
               <button
-                type='button'
+                type="button"
                 onClick={goToNextTrack}
                 disabled={dreamTracks.length === 0}
-                className='rounded-full border border-slate-700/35 bg-white/40 px-3 py-1.5 text-[9px] uppercase tracking-[0.16em] text-slate-800 transition hover:bg-white/65 disabled:opacity-50'
-                title='Next Track'
+                className="rounded-full border border-slate-700/35 bg-white/40 px-3 py-1.5 text-[9px] uppercase tracking-[0.16em] text-slate-800 transition hover:bg-white/65 disabled:opacity-50"
+                title="Next Track"
               >
                 Next
               </button>
 
-              <div className='flex items-center gap-1.5 ml-auto'>
+              <div className="flex items-center gap-1.5 ml-auto">
                 <button
-                  type='button'
+                  type="button"
                   onClick={() =>
                     setAmbientIndex((prev) => (prev >= AMBIENT_SOUNDS.length - 1 ? -1 : prev + 1))
                   }
                   className={`flex items-center gap-1.5 px-2 py-1 rounded-full border transition-all ${
                     ambientIndex >= 0
-                      ? 'bg-white/45 border-white/60 shadow-sm text-slate-800'
-                      : 'bg-white/5 border-transparent opacity-60 hover:opacity-100 text-slate-600'
+                      ? "bg-white/45 border-white/60 shadow-sm text-slate-800"
+                      : "bg-white/5 border-transparent opacity-60 hover:opacity-100 text-slate-600"
                   }`}
                   title={
                     ambientIndex >= 0
                       ? `Playing: ${AMBIENT_SOUNDS[ambientIndex].label} — click to cycle`
-                      : 'Enable ambient sounds'
+                      : "Enable ambient sounds"
                   }
                 >
                   <CloudRain size={12} />
                   {ambientIndex >= 0 && (
-                    <span className='hidden text-[9px] uppercase tracking-wider sm:inline'>
+                    <span className="hidden text-[9px] uppercase tracking-wider sm:inline">
                       {AMBIENT_SOUNDS[ambientIndex].label}
                     </span>
                   )}
                 </button>
                 {ambientIndex >= 0 && (
                   <input
-                    type='range'
-                    min='0'
-                    max='1'
-                    step='0.01'
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.01"
                     value={ambientVolume}
                     onChange={(e) => setAmbientVolume(parseFloat(e.target.value))}
-                    className='w-12 h-1 cursor-pointer accent-slate-600'
-                    title='Ambient Volume'
+                    className="w-12 h-1 cursor-pointer accent-slate-600"
+                    title="Ambient Volume"
                   />
                 )}
               </div>
@@ -1115,31 +1115,31 @@ export default function DreamTransmission() {
         )}
 
         {/* Persistent audio elements — always mounted so playback survives mode changes */}
-        <div className={playerMode === 'minimized' ? 'mt-1' : 'mt-2'}>
+        <div className={playerMode === "minimized" ? "mt-1" : "mt-2"}>
           <audio
             ref={audioRef}
             controls
-            crossOrigin='anonymous'
-            preload='metadata'
+            crossOrigin="anonymous"
+            preload="metadata"
             onPlay={handleAudioPlay}
             onEnded={goToNextTrack}
             className={
-              playerMode === 'minimized' ? 'w-full h-6 opacity-80' : 'w-full h-8 opacity-90'
+              playerMode === "minimized" ? "w-full h-6 opacity-80" : "w-full h-8 opacity-90"
             }
             src={dreamTracks[trackIndex]?.src}
             title={dreamTracks[trackIndex]?.label}
           >
-            <track kind='captions' />
+            <track kind="captions" />
             Your browser does not support the audio element.
           </audio>
         </div>
-        <audio ref={ambientRef} preload='auto' crossOrigin='anonymous' title='Ambient Sound'>
-          <track kind='captions' />
+        <audio ref={ambientRef} preload="auto" crossOrigin="anonymous" title="Ambient Sound">
+          <track kind="captions" />
         </audio>
 
-        {playerMode !== 'minimized' && (
-          <p className='mt-2 text-[10px] text-slate-700/60 text-right italic'>
-            {boostActive ? 'Boost: ON' : 'Play to boost audio'}
+        {playerMode !== "minimized" && (
+          <p className="mt-2 text-[10px] text-slate-700/60 text-right italic">
+            {boostActive ? "Boost: ON" : "Play to boost audio"}
           </p>
         )}
       </motion.div>
@@ -1148,11 +1148,11 @@ export default function DreamTransmission() {
 
       <DreamTitle wordIndex={wordIndex} />
 
-      <div className='absolute inset-0 overflow-hidden pointer-events-none z-15'>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-15">
         {comets.map((comet) => (
           <span
             key={comet.id}
-            className='absolute dt-comet'
+            className="absolute dt-comet"
             style={{
               top: `${comet.top}%`,
               left: `${comet.left}%`,

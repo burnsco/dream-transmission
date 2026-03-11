@@ -1,8 +1,8 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from "node:fs";
+import path from "node:path";
 
-const musicDir = path.resolve('public/music');
-const outputFile = path.resolve('public/music-manifest.json');
+const musicDir = path.resolve("public/music");
+const outputFile = path.resolve("public/music-manifest.json");
 
 // Ensure directory exists
 if (!fs.existsSync(musicDir)) {

@@ -1,7 +1,7 @@
 {
   "name": "dream-transmission",
-  "private": true,
   "version": "0.0.0",
+  "private": true,
   "type": "module",
   "scripts": {
     "generate-manifest": "if [ -d \"public/music\" ]; then bun scripts/generate-manifest.js; else echo \"Skipping manifest generation: public/music not found\"; fi",
@@ -15,13 +15,8 @@
     "lint": "oxlint",
     "format": "oxfmt",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "oxlint --fix",
-      "oxfmt"
-    ]
+    "prepare": "husky",
+    "lint:fix": "oxlint --fix . && oxfmt"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -46,12 +41,18 @@
     "globals": "^17.4.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.3.3",
+    "oxfmt": "^0.37.0",
+    "oxlint": "^1.53.0",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "wrangler": "^4.71.0",
-    "oxlint": "^1.52.0",
-    "oxfmt": "^0.37.0"
+    "wrangler": "^4.72.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "oxlint --fix",
+      "oxfmt"
+    ]
   }
 }
